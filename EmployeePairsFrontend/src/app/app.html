@@ -1,0 +1,65 @@
+<main class="mx-auto max-w-3xl px-4 py-10 font-sans text-slate-800">
+  <h1 class="text-3xl font-semibold">Pair of employees who have worked together</h1>
+  <p class="mt-2 text-slate-600">
+    Select a CSV file in the format <code class="rounded bg-slate-100 px-1">EmpID, ProjectID, DateFrom, DateTo</code>
+    to find the pair of employees who worked together on common projects for the longest time.
+  </p>
+
+  <label
+    class="mt-6 inline-flex cursor-pointer items-center gap-3 rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700"
+    [class.opacity-50]="loading()"
+    [class.pointer-events-none]="loading()"
+  >
+    Choose CSV file
+    <input type="file" accept=".csv,text/csv" class="hidden" (change)="onFileSelected($event)" />
+  </label>
+  @if (fileName(); as name) {
+    <span class="ml-3 text-sm text-slate-600">{{ name }}</span>
+  }
+
+  @if (loading()) {
+    <p class="mt-6 text-slate-600">Processing…</p>
+  }
+
+  @if (error(); as message) {
+    <div class="mt-6 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-red-700" role="alert">
+      {{ message }}
+    </div>
+  }
+
+  @if (noOverlap()) {
+    <p class="mt-6 text-slate-600">No pair of employees has worked together on a common project.</p>
+  }
+
+  @if (pair(); as result) {
+    <section class="mt-8">
+      <p class="text-lg">
+        Longest working pair:
+        <span class="font-mono font-semibold">
+          {{ result.employeeId1 }}, {{ result.employeeId2 }}, {{ result.totalDaysWorked }}
+        </span>
+      </p>
+
+      <table class="mt-4 w-full border-collapse text-left">
+        <thead>
+          <tr class="border-b border-slate-300 bg-slate-50">
+            <th class="px-3 py-2 font-medium">Employee ID #1</th>
+            <th class="px-3 py-2 font-medium">Employee ID #2</th>
+            <th class="px-3 py-2 font-medium">Project ID</th>
+            <th class="px-3 py-2 text-right font-medium">Days worked</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (project of result.commonProjects; track project.projectId) {
+            <tr class="border-b border-slate-200">
+              <td class="px-3 py-2">{{ project.employeeId1 }}</td>
+              <td class="px-3 py-2">{{ project.employeeId2 }}</td>
+              <td class="px-3 py-2">{{ project.projectId }}</td>
+              <td class="px-3 py-2 text-right tabular-nums">{{ project.daysWorked }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </section>
+  }
+</main>
